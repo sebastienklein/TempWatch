@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title> SF Vs LDN Temp </title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<style type="text/css">
+	circle {
+		stroke-width: 1px;
+
+	}
+</style>
+</head>
+<body>
+	<script type="text/javascript">
+
+		var xColName = "date";
+		var yColName = "temp";
+		var cColName = "city";
+
+		var svgWidth = 250;
+		var svgHeight = 250;
+		var offset = 30;
+
+		var svg = d3.select("body").append("svg")
+			.attr("width",svgWidth)
+			.attr("height",svgHeight);
+
+		var g = svg.append("g")
+			.attr("transform","translate("+offset+","+offset+")")
+
+		var xScale = d3.scale.linear().range([5,svgWidth-offset]);
+		var yScale = d3.scale.linear().range([svgHeight-offset,0]);
+		var cScale = d3.scale.category10();
+
+		function render(data)
+		{
+				xScale.domain(d3.extent(data,function(d){return d[xColName];}));
+				yScale.domain([100,0]);
+
+				//data bind
+				var circles = svg.selectAll("circle").data(data);
+
+				//init
+				circles.enter().append("circle")
+					.attr("r",5);
+
+				//update
+				circles
+					.attr("cx",function(d){ return xScale(d[xColName]);})
+					.attr("cy",function(d){ return yScale(d[yColName]);})
+					.attr("fill",function(d){return cScale(d[cColName]);})
+					.attr("r",4);
+
+				//end
+				circles.exit().remove();
+		}
+
+		function type(d)
+		{
+			d.temp = +d.temp;
+			d.date = +d.date;
+
+			return d;
+		}
+
+		d3.csv("data.csv",type,render);			
+
+
+	</script>
+</body>
+</html>
